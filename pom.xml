@@ -31,6 +31,23 @@
 			<email>noooldown@gmail.com</email>
 		</developer>
 	</developers>
+	
+	<contributors>
+		<contributor>
+			<name>Oliver Bläser</name>
+			<email>McBluna@mcbluna.net</email>
+			<organization>McBluna.net</organization>
+			<organizationUrl>https://www.mcbluna.net</organizationUrl>
+		</contributor>
+	</contributors>
+	
+	<distributionManagement>
+		<repository>
+			<id>ftp.mcbluna.net</id>
+			<url>${ftp.mcbluna.net}</url>
+		</repository>
+	</distributionManagement>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>14</maven.compiler.source>
@@ -46,6 +63,37 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>3.4.3</version>
+			</extension>
+		</extensions>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-source</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>3.0.0-M1</version>
+				<configuration>
+					<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-vfs2 -->
 		<dependency>
