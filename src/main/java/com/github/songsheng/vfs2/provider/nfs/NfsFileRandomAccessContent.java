@@ -18,270 +18,235 @@ package com.github.songsheng.vfs2.provider.nfs;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
-
-
-import com.sun.xfile.XFile;
-import com.sun.xfile.XRandomAccessFile;
-import com.sun.xfile.XFileInputStream;
-
 
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.provider.AbstractRandomAccessContent;
 import org.apache.commons.vfs2.util.RandomAccessMode;
 
+import com.sun.xfile.XFile;
+import com.sun.xfile.XRandomAccessFile;
+
 /**
  * RandomAccess for Nfs files
  */
-class NfsFileRandomAccessContent extends AbstractRandomAccessContent
-{
-    private final XRandomAccessFile raf;
-    private final InputStream rafis;
+class NfsFileRandomAccessContent extends AbstractRandomAccessContent {
+	private final XRandomAccessFile xRandomAccessFile;
+	private final InputStream inputStream;
 
-    public NfsFileRandomAccessContent(final XFile NfsFile, final RandomAccessMode mode) throws FileSystemException
-    {
-        super(mode);
+	public NfsFileRandomAccessContent(final XFile NfsFile, final RandomAccessMode mode) throws FileSystemException {
+		super(mode);
+		try {
+			xRandomAccessFile = new XRandomAccessFile(NfsFile, mode.getModeString());
+			inputStream = new InputStream() {
+				@Override
+				public int available() throws IOException {
+					final long available = xRandomAccessFile.length() - xRandomAccessFile.getFilePointer();
+					if (available > Integer.MAX_VALUE) {
+						return Integer.MAX_VALUE;
+					}
 
-        try
-        {
-            raf = new XRandomAccessFile(NfsFile, mode.getModeString());
-            rafis = new InputStream()
-            {
-                @Override
-                public int available() throws IOException
-                {
-                    final long available = raf.length() - raf.getFilePointer();
-                    if (available > Integer.MAX_VALUE)
-                    {
-                        return Integer.MAX_VALUE;
-                    }
+					return (int) available;
+				}
 
-                    return (int) available;
-                }
+				@Override
+				public void close() throws IOException {
+					xRandomAccessFile.close();
+				}
 
-                @Override
-                public void close() throws IOException
-                {
-                    raf.close();
-                }
+				@Override
+				public int read() throws IOException {
+					return xRandomAccessFile.readByte();
+				}
 
-                @Override
-                public int read() throws IOException
-                {
-                    return raf.readByte();
-                }
+				@Override
+				public int read(final byte[] b) throws IOException {
+					return xRandomAccessFile.read(b);
+				}
 
-                @Override
-                public int read(final byte[] b) throws IOException
-                {
-                    return raf.read(b);
-                }
+				@Override
+				public int read(final byte[] b, final int off, final int len) throws IOException {
+					return xRandomAccessFile.read(b, off, len);
+				}
 
-                @Override
-                public int read(final byte[] b, final int off, final int len) throws IOException
-                {
-                    return raf.read(b, off, len);
-                }
-
-                @Override
-                public long skip(final long n) throws IOException
-                {
-                    raf.seek(raf.getFilePointer() + n);
-                    return n;
-                }
-            };
-        } catch (final MalformedURLException e) {
-            throw new FileSystemException("vfs.provider/random-access-open-failed.error", NfsFile, e);
-        } catch (final UnknownHostException e) {
-            throw new FileSystemException("vfs.provider/random-access-open-failed.error", NfsFile, e);
-        } catch (IOException e) {
-        	throw new FileSystemException("vfs.provider/random-access-open-failed.error", NfsFile, e);
+				@Override
+				public long skip(final long n) throws IOException {
+					xRandomAccessFile.seek(xRandomAccessFile.getFilePointer() + n);
+					return n;
+				}
+			};
+		} catch (final IOException e) {
+			throw new FileSystemException("vfs.provider/random-access-open-failed.error", NfsFile, e);
 		}
-    }
+	}
 
-    public void close() throws IOException
-    {
-        raf.close();
-    }
+	@Override
+	public void close() throws IOException {
+		xRandomAccessFile.close();
+	}
 
-    public long getFilePointer() throws IOException
-    {
-        return raf.getFilePointer();
-    }
+	@Override
+	public long getFilePointer() throws IOException {
+		return xRandomAccessFile.getFilePointer();
+	}
 
-    public InputStream getInputStream() throws IOException
-    {
-        return rafis;
-    }
+	@Override
+	public InputStream getInputStream() throws IOException {
+		return inputStream;
+	}
 
-    public long length() throws IOException
-    {
-        return raf.length();
-    }
+	@Override
+	public long length() throws IOException {
+		return xRandomAccessFile.length();
+	}
 
-    public boolean readBoolean() throws IOException
-    {
-        return raf.readBoolean();
-    }
+	@Override
+	public boolean readBoolean() throws IOException {
+		return xRandomAccessFile.readBoolean();
+	}
 
-    public byte readByte() throws IOException
-    {
-        return raf.readByte();
-    }
+	@Override
+	public byte readByte() throws IOException {
+		return xRandomAccessFile.readByte();
+	}
 
-    public char readChar() throws IOException
-    {
-        return raf.readChar();
-    }
+	@Override
+	public char readChar() throws IOException {
+		return xRandomAccessFile.readChar();
+	}
 
-    public double readDouble() throws IOException
-    {
-        return raf.readDouble();
-    }
+	@Override
+	public double readDouble() throws IOException {
+		return xRandomAccessFile.readDouble();
+	}
 
-    public float readFloat() throws IOException
-    {
-        return raf.readFloat();
-    }
+	@Override
+	public float readFloat() throws IOException {
+		return xRandomAccessFile.readFloat();
+	}
 
-    public void readFully(final byte[] b) throws IOException
-    {
-        raf.readFully(b);
-    }
+	@Override
+	public void readFully(final byte[] b) throws IOException {
+		xRandomAccessFile.readFully(b);
+	}
 
-    public void readFully(final byte[] b, final int off, final int len) throws IOException
-    {
-        raf.readFully(b, off, len);
-    }
+	@Override
+	public void readFully(final byte[] b, final int off, final int len) throws IOException {
+		xRandomAccessFile.readFully(b, off, len);
+	}
 
-    public int readInt() throws IOException
-    {
-        return raf.readInt();
-    }
+	@Override
+	public int readInt() throws IOException {
+		return xRandomAccessFile.readInt();
+	}
 
-    public long readLong() throws IOException
-    {
-        return raf.readLong();
-    }
+	@Override
+	public long readLong() throws IOException {
+		return xRandomAccessFile.readLong();
+	}
 
-    public short readShort() throws IOException
-    {
-        return raf.readShort();
-    }
+	@Override
+	public short readShort() throws IOException {
+		return xRandomAccessFile.readShort();
+	}
 
-    public int readUnsignedByte() throws IOException
-    {
-        return raf.readUnsignedByte();
-    }
+	@Override
+	public int readUnsignedByte() throws IOException {
+		return xRandomAccessFile.readUnsignedByte();
+	}
 
-    public int readUnsignedShort() throws IOException
-    {
-        return raf.readUnsignedShort();
-    }
+	@Override
+	public int readUnsignedShort() throws IOException {
+		return xRandomAccessFile.readUnsignedShort();
+	}
 
-    public String readUTF() throws IOException
-    {
-        return raf.readUTF();
-    }
+	@Override
+	public String readUTF() throws IOException {
+		return xRandomAccessFile.readUTF();
+	}
 
-    public void seek(final long pos) throws IOException
-    {
-        raf.seek(pos);
-    }
+	@Override
+	public void seek(final long pos) throws IOException {
+		xRandomAccessFile.seek(pos);
+	}
 
-    public void setLength(final long newLength) throws IOException
-    {
-        throw new IOException("set length for nfs is not supported");
-    }
+	@Override
+	public void setLength(final long newLength) throws IOException {
+		throw new IOException("set length for nfs is not supported");
+	}
 
-    public int skipBytes(final int n) throws IOException
-    {
-        return raf.skipBytes(n);
-    }
+	@Override
+	public int skipBytes(final int n) throws IOException {
+		return xRandomAccessFile.skipBytes(n);
+	}
 
-    @Override
-    public void write(final byte[] b) throws IOException
-    {
-        raf.write(b);
-    }
+	@Override
+	public void write(final byte[] b) throws IOException {
+		xRandomAccessFile.write(b);
+	}
 
-    @Override
-    public void write(final byte[] b, final int off, final int len) throws IOException
-    {
-        raf.write(b, off, len);
-    }
+	@Override
+	public void write(final byte[] b, final int off, final int len) throws IOException {
+		xRandomAccessFile.write(b, off, len);
+	}
 
-    @Override
-    public void write(final int b) throws IOException
-    {
-        raf.write(b);
-    }
+	@Override
+	public void write(final int b) throws IOException {
+		xRandomAccessFile.write(b);
+	}
 
-    @Override
-    public void writeBoolean(final boolean v) throws IOException
-    {
-        raf.writeBoolean(v);
-    }
+	@Override
+	public void writeBoolean(final boolean v) throws IOException {
+		xRandomAccessFile.writeBoolean(v);
+	}
 
-    @Override
-    public void writeByte(final int v) throws IOException
-    {
-        raf.writeByte(v);
-    }
+	@Override
+	public void writeByte(final int v) throws IOException {
+		xRandomAccessFile.writeByte(v);
+	}
 
-    @Override
-    public void writeBytes(final String s) throws IOException
-    {
-        raf.writeBytes(s);
-    }
+	@Override
+	public void writeBytes(final String s) throws IOException {
+		xRandomAccessFile.writeBytes(s);
+	}
 
-    @Override
-    public void writeChar(final int v) throws IOException
-    {
-        raf.writeChar(v);
-    }
+	@Override
+	public void writeChar(final int v) throws IOException {
+		xRandomAccessFile.writeChar(v);
+	}
 
-    @Override
-    public void writeChars(final String s) throws IOException
-    {
-        raf.writeChars(s);
-    }
+	@Override
+	public void writeChars(final String s) throws IOException {
+		xRandomAccessFile.writeChars(s);
+	}
 
-    @Override
-    public void writeDouble(final double v) throws IOException
-    {
-        raf.writeDouble(v);
-    }
+	@Override
+	public void writeDouble(final double v) throws IOException {
+		xRandomAccessFile.writeDouble(v);
+	}
 
-    @Override
-    public void writeFloat(final float v) throws IOException
-    {
-        raf.writeFloat(v);
-    }
+	@Override
+	public void writeFloat(final float v) throws IOException {
+		xRandomAccessFile.writeFloat(v);
+	}
 
-    @Override
-    public void writeInt(final int v) throws IOException
-    {
-        raf.writeInt(v);
-    }
+	@Override
+	public void writeInt(final int v) throws IOException {
+		xRandomAccessFile.writeInt(v);
+	}
 
-    @Override
-    public void writeLong(final long v) throws IOException
-    {
-        raf.writeLong(v);
-    }
+	@Override
+	public void writeLong(final long v) throws IOException {
+		xRandomAccessFile.writeLong(v);
+	}
 
-    @Override
-    public void writeShort(final int v) throws IOException
-    {
-        raf.writeShort(v);
-    }
+	@Override
+	public void writeShort(final int v) throws IOException {
+		xRandomAccessFile.writeShort(v);
+	}
 
-    @Override
-    public void writeUTF(final String str) throws IOException
-    {
-        raf.writeUTF(str);
-    }
+	@Override
+	public void writeUTF(final String str) throws IOException {
+		xRandomAccessFile.writeUTF(str);
+	}
 
 }
