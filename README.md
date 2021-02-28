@@ -3,6 +3,21 @@ nfs provider for java common vfs2
 
 [![License](http://img.shields.io/badge/License-MIT-blue.svg?style=flat)](http://opensource.org/licenses/mit)
 
+## Provenance
+This is a fork of common-vfs2-nfs from [  profuz/common-vfs2-nfs  ](https://github.com/profuz/common-vfs2-nfs).
+
+The purpose of my fork is to update to yanfs 1.4
+
+    <repository>
+        <id>mcbluna.net</id>
+        <url>https://mcbluna.net/repository/</url>
+    </repository>
+
+    <dependency>
+        <groupId>net.mcbluna</groupId>
+        <artifactId>common-vfs2-nfs</artifactId>
+        <version>1.0.0</version>
+    </dependency>
 
 Project "common-vfs2-nfs" is a NFS provider for [Commons VFS](http://commons.apache.org/proper/commons-vfs/).
 
