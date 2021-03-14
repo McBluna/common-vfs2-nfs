@@ -6,7 +6,7 @@ nfs provider for java common vfs2
 ## Provenance
 This is a fork of common-vfs2-nfs from [  profuz/common-vfs2-nfs  ](https://github.com/profuz/common-vfs2-nfs).
 
-The purpose of my fork is to update to yanfs 1.4
+The purpose of my fork is to update dependencies to yanfs 1.4 and commons-vfs2 2.8.0
 
     <repository>
         <id>mcbluna.net</id>
@@ -16,7 +16,7 @@ The purpose of my fork is to update to yanfs 1.4
     <dependency>
         <groupId>net.mcbluna</groupId>
         <artifactId>common-vfs2-nfs</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </dependency>
 
 Project "common-vfs2-nfs" is a NFS provider for [Commons VFS](http://commons.apache.org/proper/commons-vfs/).
